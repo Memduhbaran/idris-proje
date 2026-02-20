@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DashboardCharts from "@/components/panel/DashboardCharts";
 
+export const dynamic = "force-dynamic";
+
 const quickActions = [
   { href: "/panel/stok/urunler?yeni=1", label: "Ürün Ekle" },
   { href: "/panel/stok/giris", label: "Stok Girişi" },

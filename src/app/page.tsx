@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const DEGER_OZELLIKLERI = [
   { baslik: "Hızlı Çözüm", aciklama: "İhtiyacınız olan hizmete hızlıca ulaşın ve zaman kaybetmeden çözüme kavuşun. İşlerinizi anında halledin." },
   { baslik: "Güvenli", aciklama: "Şeffaf ve doğrulanmış süreçlerle çalışıyoruz. İşleriniz güvence altında, içiniz rahat olsun." },
