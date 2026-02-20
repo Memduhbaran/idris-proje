@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { VitrinHeader } from "@/components/VitrinHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -26,31 +27,7 @@ export default async function VitrinPage() {
 
   return (
     <div className="min-h-screen bg-stone-100 text-stone-900 scroll-smooth">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-white/95 shadow-md backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="text-xl font-bold tracking-tight text-stone-900">
-            Ahenk Yapı
-          </Link>
-          <nav className="flex items-center gap-1 sm:gap-3">
-            <Link href="/#anasayfa" className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-900">
-              Anasayfa
-            </Link>
-            <Link href="/#hizmetler" className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-900">
-              Hizmetler
-            </Link>
-            <Link href="/#hakkimizda" className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-900">
-              Hakkımızda
-            </Link>
-            <Link href="/#iletisim" className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-900">
-              İletişim
-            </Link>
-            <Link href="/panel" className="ml-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-colors hover:bg-amber-600">
-              Giriş Yap
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <VitrinHeader />
 
       <main>
         {/* Hero / Anasayfa - görsel ve başlık */}
