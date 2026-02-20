@@ -30,7 +30,7 @@ export default async function VitrinPage() {
       <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-white/95 shadow-md backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="text-xl font-bold tracking-tight text-stone-900">
-            IDRIS
+            Ahenk Yapı
           </Link>
           <nav className="flex items-center gap-1 sm:gap-3">
             <Link href="/#anasayfa" className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-amber-50 hover:text-stone-900">
@@ -166,7 +166,7 @@ export default async function VitrinPage() {
                 ) : (
                   <div className="vitrin-prose text-stone-600">
                     <p>
-                      IDRIS, yapı ve dekorasyon sektöründe stok, taşeronluk ve gider yönetimini tek çatı altında sunan bir yönetim sistemidir. Müşteri memnuniyetini ön planda tutan, şeffaf ve güvenilir bir iş ortağı olarak hizmet vermektedir.
+                      Ahenk Yapı, yapı ve dekorasyon sektöründe stok, taşeronluk ve gider yönetimini tek çatı altında sunan bir yönetim sistemidir. Müşteri memnuniyetini ön planda tutan, şeffaf ve güvenilir bir iş ortağı olarak hizmet vermektedir.
                     </p>
                     <p>
                       Uzun yıllara dayanan saha tecrübemiz ve güçlü tedarik zincirimizle konut ve ticari projelerinizi baştan sona takip edebilirsiniz. Kalite, zamanında teslimat ve bütçe disiplini temel prensiplerimizdir.
@@ -201,7 +201,7 @@ export default async function VitrinPage() {
                     <p>
                       <strong>Adres:</strong> Örnek Mah. Yapı Sok. No: 1, 34000 İstanbul<br />
                       <strong>Telefon:</strong> +90 212 XXX XX XX<br />
-                      <strong>E-posta:</strong> info@idris.local
+                      <strong>E-posta:</strong> info@ahenkyapi.com
                     </p>
                     <p>Hafta içi 09:00 – 18:00 arası hizmetinizdeyiz.</p>
                   </div>
@@ -224,7 +224,7 @@ export default async function VitrinPage() {
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <h3 className="font-semibold uppercase tracking-wider text-white">IDRIS</h3>
+              <h3 className="font-semibold uppercase tracking-wider text-white">Ahenk Yapı</h3>
               <p className="mt-2 text-sm">Yapı ve dekorasyon yönetim sistemi.</p>
             </div>
             <div>
@@ -252,7 +252,7 @@ export default async function VitrinPage() {
             </div>
           </div>
           <div className="mt-10 border-t border-stone-700 pt-8 text-center text-sm text-stone-500">
-            IDRIS — Yapı ve dekorasyon yönetim sistemi © {new Date().getFullYear()} Tüm Hakları Saklıdır.
+            Ahenk Yapı — Yapı ve dekorasyon yönetim sistemi © {new Date().getFullYear()} Tüm Hakları Saklıdır.
           </div>
         </div>
       </footer>

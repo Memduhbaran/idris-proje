@@ -7,13 +7,13 @@ const SERVICES_BODY = `<p><strong>İnşaat ve tadilat</strong> — Yeni bina in�
 <p><strong>Dekorasyon ve iç mimari</strong> — İç tasarım, malzeme seçimi, mobilya ve aydınlatma koordinasyonu. Tek elden anahtar teslim çözümler.</p>
 <p><strong>Taşeronluk yönetimi</strong> — Elektrik, tesisat, boya, seramik vb. tüm alt iş kollarının planlanması, takibi ve ödeme yönetimi.</p>`;
 
-const ABOUT_BODY = `<p>IDRIS, yapı ve dekorasyon sektöründe stok, taşeronluk ve gider yönetimini tek çatı altında sunan bir yönetim sistemidir. Müşteri memnuniyetini ön planda tutan, şeffaf ve güvenilir bir iş ortağı olarak hizmet vermektedir.</p>
+const ABOUT_BODY = `<p>Ahenk Yapı, yapı ve dekorasyon sektöründe stok, taşeronluk ve gider yönetimini tek çatı altında sunan bir yönetim sistemidir. Müşteri memnuniyetini ön planda tutan, şeffaf ve güvenilir bir iş ortağı olarak hizmet vermektedir.</p>
 <p>Uzun yıllara dayanan saha tecrübemiz ve güçlü tedarik zincirimizle konut ve ticari projelerinizi baştan sona takip edebilirsiniz. Kalite, zamanında teslimat ve bütçe disiplini temel prensiplerimizdir.</p>`;
 
 const CONTACT_BODY = `<p>Projeleriniz ve teklif talepleriniz için bize ulaşabilirsiniz.</p>
 <p><strong>Adres:</strong> Örnek Mah. Yapı Sok. No: 1, 34000 İstanbul<br/>
 <strong>Telefon:</strong> +90 212 XXX XX XX<br/>
-<strong>E-posta:</strong> info@idris.local</p>
+<strong>E-posta:</strong> info@ahenkyapi.com</p>
 <p>Hafta içi 09:00 – 18:00 arası hizmetinizdeyiz.</p>`;
 
 const DEFAULT_POPULAR_SERVICES = [
@@ -29,13 +29,13 @@ const DEFAULT_POPULAR_SERVICES = [
 ];
 
 async function main() {
-  const hash = await bcrypt.hash("idris123", 10);
+  const hash = await bcrypt.hash("ahenk123", 10);
   const user = await prisma.user.upsert({
-    where: { email: "admin@idris.local" },
+    where: { email: "admin@ahenkyapi.com" },
     update: {},
     create: {
       name: "Admin",
-      email: "admin@idris.local",
+      email: "admin@ahenkyapi.com",
       passwordHash: hash,
     },
   });
@@ -76,7 +76,7 @@ async function main() {
     console.log("Popüler hizmet kartları eklendi:", DEFAULT_POPULAR_SERVICES.length);
   }
 
-  console.log("Seed OK. Kullanıcı:", user.email, "— Şifre: idris123");
+  console.log("Seed OK. Kullanıcı:", user.email, "— Şifre: ahenk123");
 }
 
 main()

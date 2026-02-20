@@ -1,4 +1,4 @@
-# IDRIS — Yapı ve Dekorasyon Yönetim Sistemi
+# Ahenk Yapı — Yapı ve Dekorasyon Yönetim Sistemi
 
 Tek sistem: admin panel (stok, taşeronluk, gider, raporlar, web içerik) + vitrin web sitesi.
 
@@ -25,7 +25,7 @@ npm run dev
 
 - **Vitrin (kamu):** http://localhost:3000
 - **Panel giriş:** http://localhost:3000/panel  
-  Varsayılan: `admin@idris.local` / `idris123`
+  Varsayılan: `admin@ahenkyapi.com` / `ahenk123`
 
 ## Özellikler (MVP)
 

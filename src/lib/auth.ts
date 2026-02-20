@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
-const SESSION_COOKIE = "idris_session";
+const SESSION_COOKIE = "ahenk_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export async function hashPassword(password: string): Promise<string> {

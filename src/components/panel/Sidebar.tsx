@@ -130,7 +130,7 @@ export default function Sidebar(props: SidebarProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </span>
-          IDRIS
+          Ahenk Yapı
         </Link>
       </div>
       <nav className="flex-1 overflow-y-auto py-3 px-2">

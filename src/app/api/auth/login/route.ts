@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     if (e instanceof z.ZodError) {
       return NextResponse.json({ error: "E-posta ve şifre zorunludur." }, { status: 400 });
     }
+    console.error("[login]", e);
     return NextResponse.json({ error: "Sunucu hatası." }, { status: 500 });
   }
 }

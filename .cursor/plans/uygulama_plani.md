@@ -1,11 +1,11 @@
 ---
-name: IDRIS MVP Ürün Dokümanı
+name: Ahenk Yapı MVP Ürün Dokümanı
 overview: "Yapı/dekorasyon firması için tek sistem (admin panel + vitrin web): stok hareket bazlı, taşeronluk, gider, raporlar, basit CMS. Audit log zorunlu, silme yok (arşiv/ters kayıt), negatif stok varsayılan engelli. 2–4 haftalık sprint’e bölünmüş uygulanabilir plan."
 todos: []
 isProject: false
 ---
 
-# IDRIS MVP — Geliştirici Ürün Dokümanı
+# Ahenk Yapı MVP — Geliştirici Ürün Dokümanı
 
 ## 1. Kapsam Özeti
 

@@ -45,7 +45,7 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </span>
-          <h1 className="text-xl font-semibold text-white tracking-tight">IDRIS Panel</h1>
+          <h1 className="text-xl font-semibold text-white tracking-tight">Ahenk Yapı Panel</h1>
           <p className="text-slate-400 text-sm mt-1">Yönetim paneline giriş yapın</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-5">

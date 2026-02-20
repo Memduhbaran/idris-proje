@@ -12,7 +12,7 @@ Kod henüz GitHub’da değilse:
 git init
 git add .
 git commit -m "Initial commit"
-# GitHub’da yeni repo oluştur (örn. idris-proje veya ahenkyapi)
+# GitHub’da yeni repo oluştur (örn. ahenk-yapi veya ahenkyapi)
 git remote add origin https://github.com/KULLANICI_ADIN/repo-adı.git
 git branch -M main
 git push -u origin main
@@ -33,12 +33,17 @@ git push -u origin main
 
 SQLite dosyasının silinmemesi için bir volume bağlaman gerekir.
 
-1. Açılan serviste **Variables** sekmesine gir.
-2. Üstte **+ New** yanında **Volume** (veya sol menüden servise tıkla → **Volumes**) seçeneğini bul.
-3. **Add Volume** → Mount path: **`/data`** yaz → **Add**.
-4. Variables kısmına dön, **Variable** ekle:
+1. Railway proje sayfasında (servislerin göründüğü canvas/alan) **Command Palette** aç:
+   - **Mac:** `⌘ + K`
+   - **Windows/Linux:** `Ctrl + K`
+2. Açılan arama kutusuna **"volume"** yaz → **Create Volume** (veya benzeri) seçeneğini seç.
+3. Volume’u **hangi servise** bağlayacağın sorulur → **ahenk-yapi** servisini seç.
+4. **Mount path** sorulursa: **`/data`** yaz.
+5. Volume oluşturulduktan sonra **Variables** sekmesine gir ve ekle:
    - **Name:** `DATABASE_URL`
    - **Value:** `file:/data/prod.db`
+
+**Alternatif:** Proje alanında (servis kutularının olduğu yerde) boş bir yere **sağ tıkla** → menüde **Add Volume** / **Create Volume** varsa onu kullan, bağlanacak servis olarak **ahenk-yapi**’yi seç, mount path: **`/data`**.
 
 Böylece veritabanı `/data/prod.db` dosyasında kalıcı olarak tutulur.
 
@@ -117,8 +122,8 @@ olarak geri almak.
 
 - **Panel:** `https://ahenkyapi.com/panel`  
 - **Varsayılan giriş** (seed’ten):  
-  - E-posta: `admin@idris.local`  
-  - Şifre: `idris123`  
+  - E-posta: `admin@ahenkyapi.com`  
+  - Şifre: `ahenk123`  
 
 Canlıya aldıktan sonra mutlaka **Panel → Ayarlar → Şifre değiştir** ile şifreyi güncelle.
 
