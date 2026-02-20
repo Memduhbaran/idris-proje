@@ -36,7 +36,7 @@ export default function PanelClient({
         <Sidebar />
       </div>
       <TopBar userName={userName} onMenuClick={() => setSidebarOpen(true)} />
-      <main className="pl-0 md:pl-60 pt-14 min-h-screen p-4 md:p-6">{children}</main>
+      <main className="pt-14 min-h-screen pl-4 pr-4 pb-4 md:pl-[calc(15rem+1.5rem)] md:pr-6 md:pb-6">{children}</main>
     </div>
   );
 }

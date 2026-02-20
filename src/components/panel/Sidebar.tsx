@@ -60,30 +60,10 @@ const items: Array<{
   sub?: Array<{ href: string; label: string }>;
 }> = [
   { href: "/panel", label: "Anasayfa", icon: "home" },
-  { href: "/panel/stok/kategoriler", label: "Stok", icon: "stok", sub: [
-    { href: "/panel/stok/kategoriler", label: "Kategoriler" },
-    { href: "/panel/stok/urunler", label: "Ürünler" },
-    { href: "/panel/stok/hareketler", label: "Hareketler" },
-    { href: "/panel/stok/giris", label: "Stok Girişi" },
-    { href: "/panel/stok/cikis", label: "Satış (Çıkış)" },
-    { href: "/panel/stok/duzeltme", label: "Stok Düzeltme" },
-    { href: "/panel/stok/iptal", label: "İptal / Ters Kayıt" },
-  ]},
-  { href: "/panel/taseronluk", label: "Taşeronluk", icon: "taseron", sub: [
-    { href: "/panel/taseronluk", label: "Projeler" },
-    { href: "/panel/taseronluk/change-order", label: "Ek İş" },
-    { href: "/panel/taseronluk/odeme-al", label: "Ödeme Al" },
-  ]},
+  { href: "/panel/stok", label: "Stok", icon: "stok" },
+  { href: "/panel/taseronluk", label: "Taşeronluk", icon: "taseron" },
   { href: "/panel/giderler", label: "Giderler", icon: "gider" },
-  { href: "/panel/raporlar", label: "Raporlar", icon: "rapor", sub: [
-    { href: "/panel/raporlar/stok-hareket", label: "Stok Hareket" },
-    { href: "/panel/raporlar/dusuk-stok", label: "Düşük Stok" },
-    { href: "/panel/raporlar/satis", label: "Satış" },
-    { href: "/panel/raporlar/taseron", label: "Taşeron Özeti" },
-    { href: "/panel/raporlar/nakit", label: "Nakit Akışı" },
-    { href: "/panel/raporlar/gider", label: "Gider" },
-    { href: "/panel/raporlar/negatif-stok", label: "Negatif Stok" },
-  ]},
+  { href: "/panel/raporlar", label: "Raporlar", icon: "rapor" },
   { href: "/panel/web-icerik", label: "Web İçerik", icon: "web" },
   { href: "/panel/ayarlar", label: "Ayarlar", icon: "ayar", sub: [
     { href: "/panel/ayarlar", label: "Genel" },
@@ -184,7 +164,7 @@ export default function Sidebar(props: SidebarProps) {
               );
             }
 
-            const active = pathname === item.href;
+            const active = pathname === item.href || (item.href !== "/panel" && pathname.startsWith(item.href + "/"));
             return (
               <li key={item.href}>
                 <Link

@@ -1,18 +1,8 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DashboardCharts from "@/components/panel/DashboardCharts";
+import QuickActionsWithModals from "@/components/panel/QuickActionsWithModals";
 
 export const dynamic = "force-dynamic";
-
-const quickActions = [
-  { href: "/panel/stok/urunler?yeni=1", label: "Ürün Ekle" },
-  { href: "/panel/stok/giris", label: "Stok Girişi" },
-  { href: "/panel/stok/cikis", label: "Satış (Stok Çıkışı)" },
-  { href: "/panel/stok/duzeltme", label: "Stok Düzeltme" },
-  { href: "/panel/taseronluk?yeni=1", label: "Yeni Proje" },
-  { href: "/panel/taseronluk/odeme-al", label: "Ödeme Al" },
-  { href: "/panel/giderler?yeni=1", label: "Gider Ekle" },
-];
 
 export default async function AnasayfaPage() {
   const [
@@ -103,17 +93,7 @@ export default async function AnasayfaPage() {
 
       <section>
         <h2 className="panel-section-title">Hızlı İşlemler</h2>
-        <div className="flex flex-wrap gap-2">
-          {quickActions.map((a) => (
-            <Link
-              key={a.href}
-              href={a.href}
-              className="panel-btn-primary"
-            >
-              {a.label}
-            </Link>
-          ))}
-        </div>
+        <QuickActionsWithModals />
       </section>
 
       <section>

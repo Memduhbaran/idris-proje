@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { OdemeAlModal } from "@/components/panel/taseronluk/OdemeAlModal";
 
 type Project = {
   id: string;
@@ -21,6 +22,7 @@ type Project = {
 
 export default function TaseronlukPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const openNew = searchParams.get("yeni") === "1";
   const [list, setList] = useState<Project[]>([]);
   const [q, setQ] = useState("");
@@ -39,6 +41,8 @@ export default function TaseronlukPage() {
   });
   const [editId, setEditId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [showOdemeAl, setShowOdemeAl] = useState(false);
+  const [odemeAlProjectId, setOdemeAlProjectId] = useState<string | undefined>(undefined);
 
   function load() {
     setLoading(true);
@@ -58,6 +62,13 @@ export default function TaseronlukPage() {
   useEffect(() => {
     if (openNew) setModal("new");
   }, [openNew]);
+
+  useEffect(() => {
+    if (searchParams.get("modal") === "odeme") {
+      setShowOdemeAl(true);
+      router.replace("/panel/taseronluk", { scroll: false });
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -105,6 +116,9 @@ export default function TaseronlukPage() {
           <option value="open">Açık</option>
           <option value="closed">Kapalı</option>
         </select>
+        <button type="button" onClick={() => { setOdemeAlProjectId(undefined); setShowOdemeAl(true); }} className="panel-btn-primary">
+          Ödeme Al
+        </button>
         <button type="button" onClick={() => { setModal("new"); setForm({ name: "", ownerName: "", ownerPhone: "", agreementAmount: 0, downPayment: 0, startDate: new Date().toISOString().slice(0, 10), status: "open", note: "" }); setEditId(null); setError(""); }} className="panel-btn-primary ml-auto">
           Yeni proje
         </button>
@@ -144,7 +158,7 @@ export default function TaseronlukPage() {
                       <Link href={`/panel/taseronluk/${p.id}`} className="panel-btn-ghost text-sm py-1.5">Gör</Link>
                       {p.status === "open" && <button type="button" onClick={() => toggleClose(p)} className="text-amber-600 hover:text-amber-700 text-sm font-medium">Kapat</button>}
                       {p.status === "closed" && <button type="button" onClick={() => toggleClose(p)} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">Aç</button>}
-                      <Link href={`/panel/taseronluk/odeme-al?proje=${p.id}`} className="text-slate-600 hover:text-slate-900 text-sm font-medium">Ödeme al</Link>
+                      <button type="button" onClick={() => { setOdemeAlProjectId(p.id); setShowOdemeAl(true); }} className="text-slate-600 hover:text-slate-900 text-sm font-medium">Ödeme al</button>
                     </span>
                   </td>
                 </tr>
@@ -209,6 +223,13 @@ export default function TaseronlukPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {showOdemeAl && (
+        <OdemeAlModal
+          onClose={() => setShowOdemeAl(false)}
+          initialProjectId={odemeAlProjectId}
+        />
       )}
     </div>
   );
