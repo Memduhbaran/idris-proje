@@ -15,22 +15,23 @@ export default function PanelClient({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="fixed inset-0 z-40 md:hidden">
-        {sidebarOpen && (
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setSidebarOpen(false)}
-            aria-hidden
-          />
-        )}
+      {/* Mobil: overlay sadece menü açıkken — full-screen wrapper yok, tıklamalar main'e ulaşır */}
+      {sidebarOpen && (
         <div
-          className={`absolute left-0 top-0 bottom-0 w-60 z-50 transform transition-transform duration-200 ease-out md:translate-x-0 ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <Sidebar onNavigate={() => setSidebarOpen(false)} />
-        </div>
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
+      {/* Mobil: sidebar drawer */}
+      <div
+        className={`fixed left-0 top-0 bottom-0 w-64 max-w-[85vw] z-50 transform transition-transform duration-200 ease-out md:hidden ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <Sidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
+      {/* Masaüstü: sabit sidebar */}
       <div className="hidden md:block fixed left-0 top-0 bottom-0 w-60 z-30">
         <Sidebar />
       </div>

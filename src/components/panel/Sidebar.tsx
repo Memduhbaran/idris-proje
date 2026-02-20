@@ -146,7 +146,7 @@ export default function Sidebar(props: SidebarProps) {
                   <button
                     type="button"
                     onClick={() => toggle(item.href)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                    className={`flex w-full min-h-[44px] items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors touch-manipulation md:min-h-0 ${
                       isGroupActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
                     }`}
                   >
@@ -166,7 +166,7 @@ export default function Sidebar(props: SidebarProps) {
                               <Link
                                 href={s.href}
                                 onClick={onNavigate}
-                                className={`block rounded-md py-2 pl-2 -ml-px text-sm transition-colors border-l-2 ${
+                                className={`flex items-center min-h-[44px] rounded-md py-2 pl-2 -ml-px text-sm transition-colors border-l-2 touch-manipulation md:min-h-0 ${
                                   active
                                     ? "border-amber-500 bg-amber-500/10 text-amber-400"
                                     : "border-transparent text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
@@ -190,7 +190,7 @@ export default function Sidebar(props: SidebarProps) {
                 <Link
                   href={item.href}
                   onClick={onNavigate}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center min-h-[44px] gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors touch-manipulation md:min-h-0 ${
                     active ? "bg-amber-500/15 text-amber-400" : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
                   }`}
                 >
