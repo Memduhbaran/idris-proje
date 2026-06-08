@@ -7,9 +7,10 @@ import { StokDuzeltmeModal } from "@/components/panel/stok/StokDuzeltmeModal";
 import { OdemeAlModal } from "@/components/panel/taseronluk/OdemeAlModal";
 import { YeniUrunModal } from "@/components/panel/YeniUrunModal";
 import { YeniProjeModal } from "@/components/panel/YeniProjeModal";
-import { GiderEkleModal } from "@/components/panel/GiderEkleModal";
+import { MuhasebeKayitModal } from "@/components/panel/muhasebe/MuhasebeKayitModal";
+import type { AccountingType } from "@/lib/muhasebe";
 
-type ModalType = "giris" | "cikis" | "duzeltme" | "odeme" | "urun" | "proje" | "gider" | null;
+type ModalType = "giris" | "cikis" | "duzeltme" | "odeme" | "urun" | "proje" | AccountingType | null;
 
 const ACTIONS: { type: ModalType; label: string }[] = [
   { type: "giris", label: "Stok Girişi" },
@@ -18,7 +19,8 @@ const ACTIONS: { type: ModalType; label: string }[] = [
   { type: "odeme", label: "Ödeme Al" },
   { type: "urun", label: "Ürün Ekle" },
   { type: "proje", label: "Yeni Proje" },
-  { type: "gider", label: "Gider Ekle" },
+  { type: "income", label: "Gelir Ekle" },
+  { type: "expense", label: "Gider Ekle" },
 ];
 
 export default function QuickActionsWithModals() {
@@ -45,7 +47,9 @@ export default function QuickActionsWithModals() {
       {modal === "odeme" && <OdemeAlModal onClose={() => setModal(null)} />}
       {modal === "urun" && <YeniUrunModal onClose={() => setModal(null)} />}
       {modal === "proje" && <YeniProjeModal onClose={() => setModal(null)} />}
-      {modal === "gider" && <GiderEkleModal onClose={() => setModal(null)} />}
+      {(modal === "income" || modal === "expense") && (
+        <MuhasebeKayitModal type={modal} onClose={() => setModal(null)} />
+      )}
     </>
   );
 }

@@ -62,7 +62,7 @@ const items: Array<{
   { href: "/panel", label: "Anasayfa", icon: "home" },
   { href: "/panel/stok", label: "Stok", icon: "stok" },
   { href: "/panel/taseronluk", label: "Taşeronluk", icon: "taseron" },
-  { href: "/panel/giderler", label: "Giderler", icon: "gider" },
+  { href: "/panel/muhasebe", label: "Muhasebe", icon: "gider" },
   { href: "/panel/raporlar", label: "Raporlar", icon: "rapor" },
   { href: "/panel/web-icerik", label: "Web İçerik", icon: "web" },
   { href: "/panel/ayarlar", label: "Ayarlar", icon: "ayar", sub: [

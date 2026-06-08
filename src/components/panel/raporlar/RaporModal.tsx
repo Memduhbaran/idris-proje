@@ -407,7 +407,7 @@ const RAPOR_MAP: Record<string, { label: string; Component: (props: { onClose: (
   "satis": { label: "Satış raporu", Component: RaporSatis },
   "taseron": { label: "Taşeron proje özeti", Component: RaporTaseron },
   "nakit": { label: "Nakit akışı", Component: RaporNakit },
-  "gider": { label: "Gider raporu", Component: RaporGider },
+  "gider": { label: "Muhasebe gider raporu", Component: RaporGider },
   "negatif-stok": { label: "Negatif stokla işlemler", Component: RaporNegatifStok },
 };
 

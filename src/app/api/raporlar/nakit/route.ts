@@ -11,9 +11,16 @@ export async function GET(request: Request) {
   start.setDate(start.getDate() - days);
   start.setHours(0, 0, 0, 0);
 
-  const [payments, expenses] = await Promise.all([
+  const [payments, incomes, expenses] = await Promise.all([
     prisma.payment.findMany({ where: { txDate: { gte: start } }, orderBy: { txDate: "asc" } }),
-    prisma.expense.findMany({ where: { txDate: { gte: start } }, orderBy: { txDate: "asc" } }),
+    prisma.accountingEntry.findMany({
+      where: { type: "income", txDate: { gte: start } },
+      orderBy: { txDate: "asc" },
+    }),
+    prisma.accountingEntry.findMany({
+      where: { type: "expense", txDate: { gte: start } },
+      orderBy: { txDate: "asc" },
+    }),
   ]);
 
   const byDay: Record<string, { in: number; out: number }> = {};
@@ -22,13 +29,19 @@ export async function GET(request: Request) {
     if (!byDay[d]) byDay[d] = { in: 0, out: 0 };
     byDay[d].in += p.amount;
   });
+  incomes.forEach((e) => {
+    const d = new Date(e.txDate).toISOString().slice(0, 10);
+    if (!byDay[d]) byDay[d] = { in: 0, out: 0 };
+    byDay[d].in += e.amount;
+  });
   expenses.forEach((e) => {
     const d = new Date(e.txDate).toISOString().slice(0, 10);
     if (!byDay[d]) byDay[d] = { in: 0, out: 0 };
     byDay[d].out += e.amount;
   });
 
-  const totalIn = payments.reduce((s, p) => s + p.amount, 0);
+  const totalIn =
+    payments.reduce((s, p) => s + p.amount, 0) + incomes.reduce((s, e) => s + e.amount, 0);
   const totalOut = expenses.reduce((s, e) => s + e.amount, 0);
 
   const series = Object.entries(byDay)

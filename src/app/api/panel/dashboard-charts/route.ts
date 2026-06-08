@@ -12,13 +12,17 @@ export async function GET(request: Request) {
   start.setDate(start.getDate() - days);
   start.setHours(0, 0, 0, 0);
 
-  const [salesMovements, expenses, payments, products] = await Promise.all([
+  const [salesMovements, expenses, incomes, payments, products] = await Promise.all([
     prisma.inventoryMovement.findMany({
       where: { type: "out", txDate: { gte: start } },
       select: { txDate: true, qty: true, unitPrice: true },
     }),
-    prisma.expense.findMany({
-      where: { txDate: { gte: start } },
+    prisma.accountingEntry.findMany({
+      where: { type: "expense", txDate: { gte: start } },
+      select: { txDate: true, amount: true },
+    }),
+    prisma.accountingEntry.findMany({
+      where: { type: "income", txDate: { gte: start } },
       select: { txDate: true, amount: true },
     }),
     prisma.payment.findMany({
@@ -42,6 +46,11 @@ export async function GET(request: Request) {
     if (!byDay[d]) byDay[d] = { sales: 0, expense: 0, cashIn: 0, cashOut: 0 };
     byDay[d].expense += e.amount;
     byDay[d].cashOut += e.amount;
+  });
+  incomes.forEach((e) => {
+    const d = new Date(e.txDate).toISOString().slice(0, 10);
+    if (!byDay[d]) byDay[d] = { sales: 0, expense: 0, cashIn: 0, cashOut: 0 };
+    byDay[d].cashIn += e.amount;
   });
   payments.forEach((p) => {
     const d = new Date(p.txDate).toISOString().slice(0, 10);

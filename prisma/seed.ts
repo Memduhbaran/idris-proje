@@ -76,6 +76,27 @@ async function main() {
     console.log("Popüler hizmet kartları eklendi:", DEFAULT_POPULAR_SERVICES.length);
   }
 
+  const projectsWithDown = await prisma.project.findMany({
+    where: { downPayment: { gt: 0 } },
+    include: { payments: true },
+  });
+  for (const p of projectsWithDown) {
+    const hasPesinat = p.payments.some(
+      (pay) => pay.paymentType === "Peşinat" && pay.amount === p.downPayment
+    );
+    if (!hasPesinat) {
+      await prisma.payment.create({
+        data: {
+          projectId: p.id,
+          amount: p.downPayment,
+          paymentType: "Peşinat",
+          txDate: p.startDate,
+          note: "Peşinat (otomatik migrasyon)",
+        },
+      });
+    }
+  }
+
   console.log("Seed OK. Kullanıcı:", user.email, "— Şifre: ahenk123");
 }
 

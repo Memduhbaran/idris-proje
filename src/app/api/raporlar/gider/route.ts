@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/** Muhasebe gider kayıtları (type=expense) */
 export async function GET(request: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -11,20 +12,31 @@ export async function GET(request: Request) {
   const type = searchParams.get("type") ?? "";
   const projectId = searchParams.get("projectId") ?? "";
 
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { type: "expense" };
   if (from || to) {
     where.txDate = {};
     if (from) (where.txDate as Record<string, Date>).gte = new Date(from);
     if (to) (where.txDate as Record<string, Date>).lte = new Date(to + "T23:59:59.999");
   }
-  if (type === "general" || type === "project") where.expenseType = type;
+  if (type === "project") where.projectId = { not: null };
+  if (type === "general") where.projectId = null;
   if (projectId) where.projectId = projectId;
 
-  const list = await prisma.expense.findMany({
+  const entries = await prisma.accountingEntry.findMany({
     where,
     include: { project: { select: { name: true } } },
     orderBy: { txDate: "desc" },
   });
+
+  const list = entries.map((e) => ({
+    id: e.id,
+    amount: e.amount,
+    expenseItem: e.title,
+    expenseType: e.projectId ? "project" : "general",
+    paymentType: e.paymentType ?? "",
+    txDate: e.txDate,
+    project: e.project,
+  }));
 
   const total = list.reduce((s, e) => s + e.amount, 0);
   const byProject: Record<string, number> = {};

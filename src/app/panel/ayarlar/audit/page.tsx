@@ -47,7 +47,7 @@ export default async function AuditLogPage({
               <option value="Product">Product</option>
               <option value="InventoryMovement">InventoryMovement</option>
               <option value="Project">Project</option>
-              <option value="Expense">Expense</option>
+              <option value="AccountingEntry">AccountingEntry</option>
             </select>
             <select name="action" className="panel-select w-40 text-sm">
               <option value="">Tüm aksiyonlar</option>

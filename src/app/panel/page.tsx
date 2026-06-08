@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { formatMoneyTL } from "@/lib/money";
 import DashboardCharts from "@/components/panel/DashboardCharts";
 import QuickActionsWithModals from "@/components/panel/QuickActionsWithModals";
 
@@ -12,6 +13,9 @@ export default async function AnasayfaPage() {
     monthSales,
     openProjectsReceivable,
     monthExpenses,
+    monthIncome,
+    openReceivable,
+    openPayable,
     recentAdjustmentsCount,
     lastMovements,
   ] = await Promise.all([
@@ -56,12 +60,31 @@ export default async function AnasayfaPage() {
       start.setDate(1);
       start.setHours(0, 0, 0, 0);
       const end = new Date();
-      const r = await prisma.expense.aggregate({
-        where: { txDate: { gte: start, lte: end } },
+      const r = await prisma.accountingEntry.aggregate({
+        where: { type: "expense", txDate: { gte: start, lte: end } },
         _sum: { amount: true },
       });
       return r._sum.amount ?? 0;
     })(),
+    (async () => {
+      const start = new Date();
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      const r = await prisma.accountingEntry.aggregate({
+        where: { type: "income", txDate: { gte: start, lte: end } },
+        _sum: { amount: true },
+      });
+      return r._sum.amount ?? 0;
+    })(),
+    prisma.accountingEntry.aggregate({
+      where: { type: { in: ["receivable", "term_receivable"] }, status: "open" },
+      _sum: { amount: true },
+    }).then((r) => r._sum.amount ?? 0),
+    prisma.accountingEntry.aggregate({
+      where: { type: { in: ["payable", "term_payable"] }, status: "open" },
+      _sum: { amount: true },
+    }).then((r) => r._sum.amount ?? 0),
     prisma.inventoryMovement.count({
       where: {
         type: "adjustment",
@@ -80,10 +103,13 @@ export default async function AnasayfaPage() {
   const cards = [
     { title: "Toplam aktif ürün", value: String(activeProductsCount) },
     { title: "Min stok altındaki ürün", value: String(lowStockCount) },
-    { title: "Bugünkü satış toplamı", value: `${todaySales.toFixed(2)} ₺` },
-    { title: "Bu ay satış toplamı", value: `${monthSales.toFixed(2)} ₺` },
-    { title: "Açık projelerde toplam alacak", value: `${openProjectsReceivable.toFixed(2)} ₺` },
-    { title: "Bu ay gider", value: `${monthExpenses.toFixed(2)} ₺` },
+    { title: "Bugünkü satış toplamı", value: `${formatMoneyTL(Math.round(todaySales))} ₺` },
+    { title: "Bu ay satış toplamı", value: `${formatMoneyTL(Math.round(monthSales))} ₺` },
+    { title: "Açık projelerde toplam alacak", value: `${formatMoneyTL(Math.round(openProjectsReceivable))} ₺` },
+    { title: "Bu ay gelir", value: `${formatMoneyTL(Math.round(monthIncome))} ₺` },
+    { title: "Bu ay gider", value: `${formatMoneyTL(Math.round(monthExpenses))} ₺` },
+    { title: "Açık alacak", value: `${formatMoneyTL(Math.round(openReceivable))} ₺` },
+    { title: "Açık borç", value: `${formatMoneyTL(Math.round(openPayable))} ₺` },
     { title: "Son 7 gün stok düzeltme sayısı", value: String(recentAdjustmentsCount) },
   ];
 

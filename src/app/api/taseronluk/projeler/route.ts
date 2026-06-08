@@ -53,16 +53,30 @@ export async function POST(request: Request) {
       agreementAmount: Number(body.agreementAmount),
       downPayment: Number(body.downPayment) ?? 0,
     });
+    const downPayment = Math.round(data.downPayment ?? 0);
+    const startDate = new Date(data.startDate);
     const project = await prisma.project.create({
       data: {
         name: data.name,
         ownerName: data.ownerName,
         ownerPhone: data.ownerPhone,
         agreementAmount: data.agreementAmount,
-        downPayment: data.downPayment ?? 0,
-        startDate: new Date(data.startDate),
+        downPayment,
+        startDate,
         status: data.status ?? "open",
         note: data.note ?? null,
+        ...(downPayment > 0
+          ? {
+              payments: {
+                create: {
+                  amount: downPayment,
+                  paymentType: "Peşinat",
+                  txDate: startDate,
+                  note: "Peşinat",
+                },
+              },
+            }
+          : {}),
       },
     });
     await createAuditLog({

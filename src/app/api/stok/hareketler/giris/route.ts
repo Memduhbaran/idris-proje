@@ -46,13 +46,15 @@ export async function POST(request: Request) {
     });
 
     if (createPaymentRecord && price > 0) {
-      const amount = qty * price;
-      await prisma.expense.create({
+      const amount = Math.round(qty * price);
+      await prisma.accountingEntry.create({
         data: {
+          type: "expense",
           amount,
-          expenseItem: `Stok girişi: ${product.name}`,
-          expenseType: "general",
+          title: `Stok girişi: ${product.name}`,
           paymentType: "Stok alımı",
+          status: "settled",
+          settledAt: new Date(),
           txDate: new Date(txDate),
           note: note ?? `Fiş: ${docNo}`,
         },
