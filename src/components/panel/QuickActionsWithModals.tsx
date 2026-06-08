@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { StokGirisModal } from "@/components/panel/stok/StokGirisModal";
 import { StokCikisModal } from "@/components/panel/stok/StokCikisModal";
 import { StokDuzeltmeModal } from "@/components/panel/stok/StokDuzeltmeModal";
@@ -24,7 +25,13 @@ const ACTIONS: { type: ModalType; label: string }[] = [
 ];
 
 export default function QuickActionsWithModals() {
+  const router = useRouter();
   const [modal, setModal] = useState<ModalType>(null);
+
+  function closeAndRefresh() {
+    setModal(null);
+    router.refresh();
+  }
 
   return (
     <>
@@ -44,11 +51,11 @@ export default function QuickActionsWithModals() {
       {modal === "giris" && <StokGirisModal onClose={() => setModal(null)} />}
       {modal === "cikis" && <StokCikisModal onClose={() => setModal(null)} />}
       {modal === "duzeltme" && <StokDuzeltmeModal onClose={() => setModal(null)} />}
-      {modal === "odeme" && <OdemeAlModal onClose={() => setModal(null)} />}
+      {modal === "odeme" && <OdemeAlModal onClose={closeAndRefresh} />}
       {modal === "urun" && <YeniUrunModal onClose={() => setModal(null)} />}
       {modal === "proje" && <YeniProjeModal onClose={() => setModal(null)} />}
       {(modal === "income" || modal === "expense") && (
-        <MuhasebeKayitModal type={modal} onClose={() => setModal(null)} />
+        <MuhasebeKayitModal type={modal} onClose={closeAndRefresh} onSaved={() => router.refresh()} />
       )}
     </>
   );

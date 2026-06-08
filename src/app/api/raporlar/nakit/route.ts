@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { mirroredPaymentIds } from "@/lib/muhasebe";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -23,8 +24,11 @@ export async function GET(request: Request) {
     }),
   ]);
 
+  const mirrored = mirroredPaymentIds(incomes);
+
   const byDay: Record<string, { in: number; out: number }> = {};
   payments.forEach((p) => {
+    if (mirrored.has(p.id)) return;
     const d = new Date(p.txDate).toISOString().slice(0, 10);
     if (!byDay[d]) byDay[d] = { in: 0, out: 0 };
     byDay[d].in += p.amount;
@@ -41,7 +45,8 @@ export async function GET(request: Request) {
   });
 
   const totalIn =
-    payments.reduce((s, p) => s + p.amount, 0) + incomes.reduce((s, e) => s + e.amount, 0);
+    payments.filter((p) => !mirrored.has(p.id)).reduce((s, p) => s + p.amount, 0) +
+    incomes.reduce((s, e) => s + e.amount, 0);
   const totalOut = expenses.reduce((s, e) => s + e.amount, 0);
 
   const series = Object.entries(byDay)

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getProductCurrentStock } from "@/lib/stock";
+import { mirroredPaymentIds } from "@/lib/muhasebe";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -23,17 +24,19 @@ export async function GET(request: Request) {
     }),
     prisma.accountingEntry.findMany({
       where: { type: "income", txDate: { gte: start } },
-      select: { txDate: true, amount: true },
+      select: { txDate: true, amount: true, note: true },
     }),
     prisma.payment.findMany({
       where: { txDate: { gte: start } },
-      select: { txDate: true, amount: true },
+      select: { id: true, txDate: true, amount: true },
     }),
     prisma.product.findMany({
       where: { archived: false },
       include: { category: { select: { name: true } } },
     }),
   ]);
+
+  const mirrored = mirroredPaymentIds(incomes);
 
   const byDay: Record<string, { sales: number; expense: number; cashIn: number; cashOut: number }> = {};
   salesMovements.forEach((m) => {
@@ -53,6 +56,7 @@ export async function GET(request: Request) {
     byDay[d].cashIn += e.amount;
   });
   payments.forEach((p) => {
+    if (mirrored.has(p.id)) return;
     const d = new Date(p.txDate).toISOString().slice(0, 10);
     if (!byDay[d]) byDay[d] = { sales: 0, expense: 0, cashIn: 0, cashOut: 0 };
     byDay[d].cashIn += p.amount;
