@@ -6,7 +6,7 @@ import { MuhasebeKayitModal } from "@/components/panel/muhasebe/MuhasebeKayitMod
 import { TahsilOdeModal } from "@/components/panel/muhasebe/TahsilOdeModal";
 import { formatMoneyDisplay } from "@/lib/money";
 import type { AccountingType } from "@/lib/muhasebe";
-import { ACCOUNTING_TYPE_LABELS, isPayableType, isReceivableType } from "@/lib/muhasebe";
+import { getAccountingTypeLabel, isPayableType, isReceivableType } from "@/lib/muhasebe";
 
 type Entry = {
   id: string;
@@ -34,7 +34,6 @@ const TABS = [
   { id: "gider", label: "Gider" },
   { id: "alacak", label: "Alacak" },
   { id: "borc", label: "Borç" },
-  { id: "vadeli", label: "Vadeli" },
 ] as const;
 
 const MODAL_TYPES: { type: AccountingType; label: string }[] = [
@@ -42,8 +41,6 @@ const MODAL_TYPES: { type: AccountingType; label: string }[] = [
   { type: "expense", label: "Gider Ekle" },
   { type: "receivable", label: "Alacak Ekle" },
   { type: "payable", label: "Borç Ekle" },
-  { type: "term_receivable", label: "Vadeli Alacak Ekle" },
-  { type: "term_payable", label: "Vadeli Borç Ekle" },
 ];
 
 const STATUS_LABELS: Record<string, string> = {
@@ -192,7 +189,7 @@ export default function MuhasebePage() {
               {list.map((e) => (
                 <tr key={e.id}>
                   <td className="text-slate-600">{new Date(e.txDate).toLocaleDateString("tr-TR")}</td>
-                  <td>{ACCOUNTING_TYPE_LABELS[e.type as AccountingType] ?? e.type}</td>
+                  <td>{getAccountingTypeLabel(e.type)}</td>
                   <td className="font-medium">{e.title}</td>
                   <td className="text-right font-medium">{formatMoneyDisplay(e.amount)}</td>
                   <td className="text-slate-500">{e.counterparty ?? "—"}</td>

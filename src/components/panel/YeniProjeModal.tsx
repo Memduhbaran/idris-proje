@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MoneyInput } from "@/components/panel/MoneyInput";
 
 export function YeniProjeModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
@@ -33,8 +34,8 @@ export function YeniProjeModal({ onClose }: { onClose: () => void }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   ...form,
-                  agreementAmount: Number(form.agreementAmount),
-                  downPayment: Number(form.downPayment),
+                  agreementAmount: Math.round(form.agreementAmount),
+                  downPayment: Math.round(form.downPayment),
                 }),
               });
               const data = await res.json();
@@ -68,11 +69,18 @@ export function YeniProjeModal({ onClose }: { onClose: () => void }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="panel-label">Anlaşma tutarı (₺)</label>
-              <input type="number" step="0.01" min="0" value={form.agreementAmount || ""} onChange={(e) => setForm((f) => ({ ...f, agreementAmount: Number(e.target.value) || 0 }))} className="panel-input" required />
+              <MoneyInput
+                value={form.agreementAmount}
+                onChange={(v) => setForm((f) => ({ ...f, agreementAmount: v }))}
+                required
+              />
             </div>
             <div>
               <label className="panel-label">Peşinat (₺)</label>
-              <input type="number" step="0.01" min="0" value={form.downPayment || ""} onChange={(e) => setForm((f) => ({ ...f, downPayment: Number(e.target.value) || 0 }))} className="panel-input" />
+              <MoneyInput
+                value={form.downPayment}
+                onChange={(v) => setForm((f) => ({ ...f, downPayment: v }))}
+              />
             </div>
           </div>
           <div>

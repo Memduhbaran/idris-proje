@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { MoneyInput } from "@/components/panel/MoneyInput";
 import type { AccountingType } from "@/lib/muhasebe";
-import { ACCOUNTING_TYPE_LABELS, isTermType } from "@/lib/muhasebe";
+import { ACCOUNTING_TYPE_LABELS } from "@/lib/muhasebe";
 
 type Project = { id: string; name: string };
 
@@ -15,7 +15,7 @@ type Props = {
 
 export function MuhasebeKayitModal({ type, onClose, onSaved }: Props) {
   const isIncomeExpense = type === "income" || type === "expense";
-  const needsDueDate = isTermType(type);
+  const isReceivablePayable = type === "receivable" || type === "payable";
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [templates, setTemplates] = useState<{ expenseItems: string[]; paymentTypes: string[] }>({
@@ -50,10 +50,6 @@ export function MuhasebeKayitModal({ type, onClose, onSaved }: Props) {
     e.preventDefault();
     if (amount <= 0) {
       setError("Tutar 0'dan büyük olmalı");
-      return;
-    }
-    if (needsDueDate && !dueDate) {
-      setError("Vade tarihi zorunlu");
       return;
     }
     if (isIncomeExpense && !paymentType.trim()) {
@@ -188,17 +184,14 @@ export function MuhasebeKayitModal({ type, onClose, onSaved }: Props) {
               ))}
             </select>
           </div>
-          {(needsDueDate || type === "receivable" || type === "payable") && (
+          {isReceivablePayable && (
             <div>
-              <label className="panel-label">
-                Vade tarihi{needsDueDate ? "" : " (opsiyonel)"}
-              </label>
+              <label className="panel-label">Vade tarihi (opsiyonel)</label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="panel-input"
-                required={needsDueDate}
               />
             </div>
           )}

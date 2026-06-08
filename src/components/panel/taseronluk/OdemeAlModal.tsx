@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { MoneyInput } from "@/components/panel/MoneyInput";
+import { formatMoneyDisplay } from "@/lib/money";
 
 type Project = { id: string; name: string; balance: number };
 
@@ -9,7 +11,7 @@ export function OdemeAlModal({ onClose, initialProjectId }: { onClose: () => voi
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectId, setProjectId] = useState(initialProjectId ?? "");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
   const [paymentType, setPaymentType] = useState("");
   const [paymentTypes, setPaymentTypes] = useState<string[]>([]);
   const [txDate, setTxDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -40,7 +42,7 @@ export function OdemeAlModal({ onClose, initialProjectId }: { onClose: () => voi
       setError("Proje seçin");
       return;
     }
-    if (Number(amount) <= 0) {
+    if (amount <= 0) {
       setError("Miktar 0'dan büyük olmalı");
       return;
     }
@@ -57,7 +59,7 @@ export function OdemeAlModal({ onClose, initialProjectId }: { onClose: () => voi
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
-          amount: Number(amount),
+          amount: Math.round(amount),
           paymentType: type,
           txDate,
           note: note || undefined,
@@ -95,13 +97,13 @@ export function OdemeAlModal({ onClose, initialProjectId }: { onClose: () => voi
             <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="panel-select" required>
               <option value="">Seçin</option>
               {projects.map((p) => (
-                <option key={p.id} value={p.id}>{p.name} (Bakiye: {p.balance.toFixed(2)} ₺)</option>
+                <option key={p.id} value={p.id}>{p.name} (Bakiye: {formatMoneyDisplay(Math.round(p.balance))})</option>
               ))}
             </select>
           </div>
           <div>
             <label className="panel-label">Miktar (₺)</label>
-            <input type="number" step="0.01" min="0.001" value={amount} onChange={(e) => setAmount(e.target.value)} className="panel-input" required />
+            <MoneyInput value={amount} onChange={setAmount} required />
           </div>
           <div>
             <label className="panel-label">Ödeme türü</label>

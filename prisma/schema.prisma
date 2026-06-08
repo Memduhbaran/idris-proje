@@ -119,7 +119,7 @@ model Payment {
 
 model AccountingEntry {
   id              String    @id @default(cuid())
-  type            String    // income | expense | receivable | payable | term_receivable | term_payable
+  type            String    // income | expense | receivable | payable
   amount          Float
   title           String
   counterparty    String?

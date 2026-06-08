@@ -49,8 +49,6 @@ export async function GET(request: Request) {
     where.type = { in: ["receivable", "term_receivable"] };
   } else if (tab === "borc") {
     where.type = { in: ["payable", "term_payable"] };
-  } else if (tab === "vadeli") {
-    where.type = { in: ["term_receivable", "term_payable"] };
   }
 
   if (status === "open" || status === "settled" || status === "cancelled") {
@@ -83,11 +81,6 @@ export async function POST(request: Request) {
     });
 
     const isSettleable = SETTLEABLE_TYPES.includes(data.type);
-    const needsDueDate = data.type === "term_receivable" || data.type === "term_payable";
-
-    if (needsDueDate && !data.dueDate) {
-      return NextResponse.json({ error: "Vadeli kayıt için vade tarihi zorunlu" }, { status: 400 });
-    }
 
     const entry = await prisma.accountingEntry.create({
       data: {
