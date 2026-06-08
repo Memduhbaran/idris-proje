@@ -6,6 +6,7 @@ import { createAuditLog } from "@/lib/audit";
 import { isPayableType, isReceivableType } from "@/lib/muhasebe";
 
 const settleSchema = z.object({
+  amount: z.number().positive("Tutar 0'dan büyük olmalı").optional(),
   paymentType: z.string().optional(),
   txDate: z.string().optional(),
   note: z.string().optional(),
@@ -22,7 +23,10 @@ export async function POST(
 
   try {
     const body = await request.json().catch(() => ({}));
-    const data = settleSchema.parse(body);
+    const data = settleSchema.parse({
+      ...body,
+      amount: body.amount != null ? Math.round(Number(body.amount)) : undefined,
+    });
 
     const entry = await prisma.accountingEntry.findUnique({ where: { id } });
     if (!entry) return NextResponse.json({ error: "Kayıt bulunamadı" }, { status: 404 });
@@ -36,10 +40,26 @@ export async function POST(
       return NextResponse.json({ error: "Bu kayıt türü tahsil/ödeme ile kapatılamaz" }, { status: 400 });
     }
 
+    const openAmount = Math.round(entry.amount);
+    const settleAmount = data.amount ?? openAmount;
+
+    if (settleAmount > openAmount) {
+      return NextResponse.json(
+        { error: `Tutar kalan bakiyeden (${openAmount} ₺) fazla olamaz` },
+        { status: 400 }
+      );
+    }
+
+    const isPartial = settleAmount < openAmount;
+    const remaining = openAmount - settleAmount;
     const settleType = isReceivable ? "income" : "expense";
     const settleTitle = isReceivable
-      ? `Tahsilat: ${entry.title}`
-      : `Ödeme: ${entry.title}`;
+      ? isPartial
+        ? `Kısmi tahsilat: ${entry.title}`
+        : `Tahsilat: ${entry.title}`
+      : isPartial
+        ? `Kısmi ödeme: ${entry.title}`
+        : `Ödeme: ${entry.title}`;
 
     const txDate = data.txDate ? new Date(data.txDate) : new Date();
 
@@ -47,7 +67,7 @@ export async function POST(
       const linked = await tx.accountingEntry.create({
         data: {
           type: settleType,
-          amount: Math.round(entry.amount),
+          amount: settleAmount,
           title: settleTitle,
           counterparty: entry.counterparty,
           paymentType: data.paymentType ?? entry.paymentType ?? "Nakit",
@@ -61,14 +81,16 @@ export async function POST(
 
       const updated = await tx.accountingEntry.update({
         where: { id },
-        data: {
-          status: "settled",
-          settledAt: new Date(),
-          linkedEntryId: linked.id,
-        },
+        data: isPartial
+          ? { amount: remaining }
+          : {
+              status: "settled",
+              settledAt: new Date(),
+              linkedEntryId: linked.id,
+            },
       });
 
-      return { entry: updated, linked };
+      return { entry: updated, linked, partial: isPartial, remaining };
     });
 
     await createAuditLog({
@@ -76,7 +98,12 @@ export async function POST(
       entityType: "AccountingEntry",
       entityId: id,
       action: "update",
-      details: { linkedEntryId: result.linked.id },
+      details: {
+        linkedEntryId: result.linked.id,
+        settleAmount,
+        partial: result.partial,
+        remaining: result.remaining,
+      },
     });
 
     return NextResponse.json(result);

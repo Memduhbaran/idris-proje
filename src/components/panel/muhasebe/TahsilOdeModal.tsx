@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput } from "@/components/panel/MoneyInput";
 import { formatMoneyDisplay } from "@/lib/money";
 import { isReceivableType } from "@/lib/muhasebe";
 
@@ -21,21 +22,39 @@ type Props = {
 
 export function TahsilOdeModal({ entry, onClose, onSaved }: Props) {
   const isReceivable = isReceivableType(entry.type);
+  const openAmount = Math.round(entry.amount);
+  const [amount, setAmount] = useState(openAmount);
   const [paymentType, setPaymentType] = useState(entry.paymentType ?? "Nakit");
   const [txDate, setTxDate] = useState(new Date().toISOString().slice(0, 10));
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const isPartial = amount > 0 && amount < openAmount;
+  const remaining = openAmount - amount;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (amount <= 0) {
+      setError("Tutar 0'dan büyük olmalı");
+      return;
+    }
+    if (amount > openAmount) {
+      setError(`Tutar kalan bakiyeden (${formatMoneyDisplay(openAmount)}) fazla olamaz`);
+      return;
+    }
     setError("");
     setLoading(true);
     try {
       const res = await fetch(`/api/muhasebe/${entry.id}/settle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentType, txDate, note: note || undefined }),
+        body: JSON.stringify({
+          amount,
+          paymentType,
+          txDate,
+          note: note || undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -60,8 +79,28 @@ export function TahsilOdeModal({ entry, onClose, onSaved }: Props) {
             <strong>{entry.title}</strong>
             {entry.counterparty && <> — {entry.counterparty}</>}
             <br />
-            Tutar: <strong>{formatMoneyDisplay(entry.amount)}</strong>
+            Kalan tutar: <strong>{formatMoneyDisplay(openAmount)}</strong>
           </p>
+          <div>
+            <label className="panel-label">
+              {isReceivable ? "Tahsil edilecek tutar (₺)" : "Ödenecek tutar (₺)"}
+            </label>
+            <MoneyInput value={amount} onChange={setAmount} required />
+            <div className="flex flex-wrap gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => setAmount(openAmount)}
+                className="text-xs text-amber-700 hover:text-amber-800 font-medium"
+              >
+                Tamamını {isReceivable ? "tahsil et" : "öde"}
+              </button>
+            </div>
+            {isPartial && (
+              <p className="text-sm text-slate-500 mt-1.5">
+                Kısmi işlem — kalan: <strong>{formatMoneyDisplay(remaining)}</strong>
+              </p>
+            )}
+          </div>
           <div>
             <label className="panel-label">Ödeme türü</label>
             <input
@@ -91,7 +130,15 @@ export function TahsilOdeModal({ entry, onClose, onSaved }: Props) {
               İptal
             </button>
             <button type="submit" disabled={loading} className="panel-btn-primary">
-              {loading ? "İşleniyor..." : isReceivable ? "Tahsil Et" : "Öde"}
+              {loading
+                ? "İşleniyor..."
+                : isPartial
+                  ? isReceivable
+                    ? "Kısmi Tahsil Et"
+                    : "Kısmi Öde"
+                  : isReceivable
+                    ? "Tahsil Et"
+                    : "Öde"}
             </button>
           </div>
         </form>
