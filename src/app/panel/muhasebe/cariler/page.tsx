@@ -88,21 +88,21 @@ export default function CarilerPage() {
         ) : (
           <table className="panel-table table-fixed min-w-[640px]">
             <colgroup>
-              <col className="w-[13%]" />
-              <col className="w-[13%]" />
-              <col className="w-[14%]" />
               <col className="w-[26%]" />
               <col className="w-[18%]" />
               <col className="w-[16%]" />
+              <col className="w-[13%]" />
+              <col className="w-[13%]" />
+              <col className="w-[14%]" />
             </colgroup>
             <thead>
               <tr>
-                <th className="text-right">Açık alacak</th>
-                <th className="text-right">Açık borç</th>
-                <th className="text-right">Net bakiye</th>
                 <th>Cari</th>
                 <th>Tip</th>
                 <th>Telefon</th>
+                <th className="panel-table-num">Açık alacak</th>
+                <th className="panel-table-num">Açık borç</th>
+                <th className="panel-table-num">Net bakiye</th>
               </tr>
             </thead>
             <tbody>
@@ -120,14 +120,13 @@ export default function CarilerPage() {
                   }}
                   className="cursor-pointer hover:bg-amber-50/50 focus-visible:outline-none focus-visible:bg-amber-50/50"
                 >
-                  <td className="text-right tabular-nums whitespace-nowrap">
-                    {formatMoneyDisplay(c.openReceivable)}
-                  </td>
-                  <td className="text-right tabular-nums whitespace-nowrap">
-                    {formatMoneyDisplay(c.openPayable)}
-                  </td>
+                  <td className="font-medium text-slate-900 truncate">{c.name}</td>
+                  <td className="whitespace-nowrap">{CARI_TYPE_LABELS[c.type] ?? c.type}</td>
+                  <td className="text-slate-500 truncate">{c.phone ?? "—"}</td>
+                  <td className="panel-table-num">{formatMoneyDisplay(c.openReceivable)}</td>
+                  <td className="panel-table-num">{formatMoneyDisplay(c.openPayable)}</td>
                   <td
-                    className={`text-right tabular-nums whitespace-nowrap font-medium ${
+                    className={`panel-table-num font-medium ${
                       c.netBalance > 0
                         ? "text-emerald-700"
                         : c.netBalance < 0
@@ -137,9 +136,6 @@ export default function CarilerPage() {
                   >
                     {formatMoneyDisplay(c.netBalance)}
                   </td>
-                  <td className="font-medium text-slate-900 truncate">{c.name}</td>
-                  <td className="whitespace-nowrap">{CARI_TYPE_LABELS[c.type] ?? c.type}</td>
-                  <td className="text-slate-500 truncate">{c.phone ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
