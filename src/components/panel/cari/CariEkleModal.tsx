@@ -12,7 +12,6 @@ export function CariEkleModal({ onClose, onSaved }: Props) {
   const [name, setName] = useState("");
   const [type, setType] = useState<CariType>("customer");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,7 +32,6 @@ export function CariEkleModal({ onClose, onSaved }: Props) {
           name: name.trim(),
           type,
           phone: phone.trim() || undefined,
-          email: email.trim() || undefined,
           note: note.trim() || undefined,
         }),
       });
@@ -54,7 +52,7 @@ export function CariEkleModal({ onClose, onSaved }: Props) {
   return (
     <div className="panel-modal-overlay" onClick={onClose}>
       <div className="panel-modal max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="panel-modal-header">Cari Ekle</div>
+        <div className="panel-modal-header">Müşteri Ekle</div>
         <form onSubmit={handleSubmit} className="panel-modal-body space-y-4">
           <div>
             <label className="panel-label">Ad / Firma</label>
@@ -70,15 +68,9 @@ export function CariEkleModal({ onClose, onSaved }: Props) {
               ))}
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="panel-label">Telefon</label>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} className="panel-input" />
-            </div>
-            <div>
-              <label className="panel-label">E-posta</label>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} className="panel-input" />
-            </div>
+          <div>
+            <label className="panel-label">Telefon</label>
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} className="panel-input" />
           </div>
           <div>
             <label className="panel-label">Not</label>

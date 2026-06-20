@@ -1,18 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+type CariSuggestion = { id: string; name: string; phone: string | null };
 
 export default function TopBar({ userName, onMenuClick }: { userName: string; onMenuClick?: () => void }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState<CariSuggestion[]>([]);
+  const [showSuggest, setShowSuggest] = useState(false);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     setOpen(false);
     router.push("/panel/login");
     router.refresh();
+  }
+
+  useEffect(() => {
+    const q = search.trim();
+    if (q.length < 1) {
+      setSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      fetch(`/api/cari/cariler?q=${encodeURIComponent(q)}`)
+        .then((r) => r.json())
+        .then((data: CariSuggestion[]) => setSuggestions(Array.isArray(data) ? data.slice(0, 8) : []))
+        .catch(() => setSuggestions([]));
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  function goToCustomer(id: string) {
+    setShowSuggest(false);
+    setSearch("");
+    setSuggestions([]);
+    router.push(`/panel/muhasebe/cariler/${id}`);
   }
 
   return (
@@ -28,11 +55,40 @@ export default function TopBar({ userName, onMenuClick }: { userName: string; on
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
         )}
-        <input
-          type="search"
-          placeholder="Ara..."
-          className="panel-input w-56 max-w-full py-2 text-sm"
-        />
+        <div className="relative">
+          <input
+            type="search"
+            placeholder="Müşteri ara..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setShowSuggest(true);
+            }}
+            onFocus={() => setShowSuggest(true)}
+            onBlur={() => setTimeout(() => setShowSuggest(false), 150)}
+            className="panel-input w-56 max-w-full py-2 text-sm"
+            autoComplete="off"
+          />
+          {showSuggest && search.trim() && suggestions.length > 0 && (
+            <ul className="absolute z-30 mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+              {suggestions.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    className="w-full px-3 py-2.5 text-left text-sm hover:bg-amber-50 transition-colors"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      goToCustomer(c.id);
+                    }}
+                  >
+                    <span className="font-medium text-slate-900">{c.name}</span>
+                    {c.phone && <span className="ml-2 text-slate-500">{c.phone}</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
       <div className="relative">
         <button

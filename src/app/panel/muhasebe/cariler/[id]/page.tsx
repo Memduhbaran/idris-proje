@@ -108,7 +108,7 @@ export default function CariDetayPage() {
       <div className="panel-page">
         <p className="panel-empty">Cari bulunamadı.</p>
         <Link href="/panel/muhasebe/cariler" className="text-amber-700 text-sm font-medium">
-          ← Cariler listesi
+          ← Müşteriler listesi
         </Link>
       </div>
     );
@@ -122,7 +122,7 @@ export default function CariDetayPage() {
             href="/panel/muhasebe/cariler"
             className="text-sm text-slate-500 hover:text-amber-700 mb-1 inline-block"
           >
-            ← Cariler
+            ← Müşteriler
           </Link>
           <h1 className="panel-heading mb-0">{cari?.name ?? "…"}</h1>
           {cari && (

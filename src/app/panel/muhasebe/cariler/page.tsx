@@ -30,6 +30,7 @@ export default function CarilerPage() {
   const [typeFilter, setTypeFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [showSuggest, setShowSuggest] = useState(false);
 
   function load() {
     setLoading(true);
@@ -47,26 +48,58 @@ export default function CarilerPage() {
   }, [q, typeFilter]);
 
   function goToDetail(id: string) {
+    setShowSuggest(false);
     router.push(`/panel/muhasebe/cariler/${id}`);
   }
+
+  const suggestions = q.trim() ? list.slice(0, 8) : [];
 
   return (
     <div className="panel-page space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="panel-heading mb-0">Cariler</h1>
+        <h1 className="panel-heading mb-0">Müşteriler</h1>
         <button type="button" onClick={() => setShowAdd(true)} className="panel-btn-primary ml-auto">
-          Cari Ekle
+          Müşteri
         </button>
       </div>
 
       <div className="flex flex-wrap gap-3 items-center">
-        <input
-          type="search"
-          placeholder="Ad / firma ara..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="panel-input w-56"
-        />
+        <div className="relative w-56">
+          <input
+            type="search"
+            placeholder="Müşteri ara..."
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setShowSuggest(true);
+            }}
+            onFocus={() => setShowSuggest(true)}
+            onBlur={() => setTimeout(() => setShowSuggest(false), 150)}
+            className="panel-input w-full"
+            autoComplete="off"
+          />
+          {showSuggest && suggestions.length > 0 && (
+            <ul className="absolute z-20 mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+              {suggestions.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    className="w-full px-3 py-2.5 text-left text-sm hover:bg-amber-50 transition-colors"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      goToDetail(c.id);
+                    }}
+                  >
+                    <span className="font-medium text-slate-900">{c.name}</span>
+                    {c.phone && (
+                      <span className="ml-2 text-slate-500">{c.phone}</span>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
@@ -84,7 +117,7 @@ export default function CarilerPage() {
         {loading ? (
           <p className="panel-empty">Yükleniyor...</p>
         ) : list.length === 0 ? (
-          <p className="panel-empty">Cari kaydı yok.</p>
+          <p className="panel-empty">Müşteri kaydı yok.</p>
         ) : (
           <table className="panel-table table-fixed min-w-[640px]">
             <colgroup>
@@ -97,7 +130,7 @@ export default function CarilerPage() {
             </colgroup>
             <thead>
               <tr>
-                <th>Cari</th>
+                <th>Müşteri</th>
                 <th>Tip</th>
                 <th>Telefon</th>
                 <th className="panel-table-num">Açık alacak</th>

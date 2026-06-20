@@ -64,7 +64,7 @@ const items: Array<{
   { href: "/panel/taseronluk", label: "Taşeronluk", icon: "taseron" },
   { href: "/panel/muhasebe", label: "Muhasebe", icon: "gider", sub: [
     { href: "/panel/muhasebe", label: "Genel" },
-    { href: "/panel/muhasebe/cariler", label: "Cariler" },
+    { href: "/panel/muhasebe/cariler", label: "Müşteriler" },
   ]},
   { href: "/panel/raporlar", label: "Raporlar", icon: "rapor" },
   { href: "/panel/web-icerik", label: "Web İçerik", icon: "web" },
