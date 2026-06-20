@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CariEkleModal } from "@/components/panel/cari/CariEkleModal";
 import { CARI_TYPE_LABELS, type CariType } from "@/lib/cari";
 import { formatMoneyDisplay } from "@/lib/money";
@@ -24,6 +24,7 @@ const TYPE_FILTERS = [
 ] as const;
 
 export default function CarilerPage() {
+  const router = useRouter();
   const [list, setList] = useState<CariRow[]>([]);
   const [q, setQ] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -44,6 +45,10 @@ export default function CarilerPage() {
   useEffect(() => {
     load();
   }, [q, typeFilter]);
+
+  function goToDetail(id: string) {
+    router.push(`/panel/muhasebe/cariler/${id}`);
+  }
 
   return (
     <div className="panel-page space-y-6">
@@ -78,8 +83,18 @@ export default function CarilerPage() {
       <div className="panel-card panel-table-wrap">
         {loading ? (
           <p className="panel-empty">Yükleniyor...</p>
+        ) : list.length === 0 ? (
+          <p className="panel-empty">Cari kaydı yok.</p>
         ) : (
-          <table className="panel-table">
+          <table className="panel-table table-fixed min-w-[640px]">
+            <colgroup>
+              <col className="w-[26%]" />
+              <col className="w-[18%]" />
+              <col className="w-[16%]" />
+              <col className="w-[13%]" />
+              <col className="w-[13%]" />
+              <col className="w-[14%]" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Cari</th>
@@ -88,42 +103,48 @@ export default function CarilerPage() {
                 <th className="text-right">Açık alacak</th>
                 <th className="text-right">Açık borç</th>
                 <th className="text-right">Net bakiye</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {list.map((c) => (
-                <tr key={c.id}>
-                  <td className="font-medium">{c.name}</td>
-                  <td>{CARI_TYPE_LABELS[c.type] ?? c.type}</td>
-                  <td className="text-slate-500">{c.phone ?? "—"}</td>
-                  <td className="text-right">{formatMoneyDisplay(c.openReceivable)}</td>
-                  <td className="text-right">{formatMoneyDisplay(c.openPayable)}</td>
+                <tr
+                  key={c.id}
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => goToDetail(c.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      goToDetail(c.id);
+                    }
+                  }}
+                  className="cursor-pointer hover:bg-amber-50/50 focus-visible:outline-none focus-visible:bg-amber-50/50"
+                >
+                  <td className="font-medium text-slate-900 truncate">{c.name}</td>
+                  <td className="whitespace-nowrap">{CARI_TYPE_LABELS[c.type] ?? c.type}</td>
+                  <td className="text-slate-500 truncate">{c.phone ?? "—"}</td>
+                  <td className="text-right tabular-nums whitespace-nowrap">
+                    {formatMoneyDisplay(c.openReceivable)}
+                  </td>
+                  <td className="text-right tabular-nums whitespace-nowrap">
+                    {formatMoneyDisplay(c.openPayable)}
+                  </td>
                   <td
-                    className={`text-right font-medium ${
+                    className={`text-right tabular-nums whitespace-nowrap font-medium ${
                       c.netBalance > 0
                         ? "text-emerald-700"
                         : c.netBalance < 0
                           ? "text-red-600"
-                          : ""
+                          : "text-slate-700"
                     }`}
                   >
                     {formatMoneyDisplay(c.netBalance)}
-                  </td>
-                  <td>
-                    <Link
-                      href={`/panel/muhasebe/cariler/${c.id}`}
-                      className="text-sm text-amber-700 hover:text-amber-800 font-medium"
-                    >
-                      Detay
-                    </Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
-        {list.length === 0 && !loading && <p className="panel-empty">Cari kaydı yok.</p>}
       </div>
 
       {showAdd && (
