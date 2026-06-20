@@ -62,7 +62,10 @@ const items: Array<{
   { href: "/panel", label: "Anasayfa", icon: "home" },
   { href: "/panel/stok", label: "Stok", icon: "stok" },
   { href: "/panel/taseronluk", label: "Taşeronluk", icon: "taseron" },
-  { href: "/panel/muhasebe", label: "Muhasebe", icon: "gider" },
+  { href: "/panel/muhasebe", label: "Muhasebe", icon: "gider", sub: [
+    { href: "/panel/muhasebe", label: "Genel" },
+    { href: "/panel/muhasebe/cariler", label: "Cariler" },
+  ]},
   { href: "/panel/raporlar", label: "Raporlar", icon: "rapor" },
   { href: "/panel/web-icerik", label: "Web İçerik", icon: "web" },
   { href: "/panel/ayarlar", label: "Ayarlar", icon: "ayar", sub: [
@@ -117,7 +120,15 @@ export default function Sidebar(props: SidebarProps) {
         <ul className="space-y-0.5">
           {items.map((item) => {
             const hasSub = item.sub && item.sub.length > 0;
-            const isGroupActive = hasSub && (pathname === item.href || item.sub!.some((s) => pathname === s.href));
+            const isGroupActive =
+              hasSub &&
+              (pathname === item.href ||
+                pathname.startsWith(item.href + "/") ||
+                item.sub!.some((s) =>
+                  s.href === item.href
+                    ? pathname === s.href
+                    : pathname === s.href || pathname.startsWith(s.href + "/")
+                ));
             const isOpen = hasSub && (openGroups.has(item.href) || isGroupActive);
 
             if (hasSub) {
@@ -140,7 +151,10 @@ export default function Sidebar(props: SidebarProps) {
                     <div className="overflow-hidden">
                       <ul className="ml-4 mt-0.5 mb-1 space-y-0.5 border-l border-slate-700/60 pl-3">
                         {item.sub!.map((s) => {
-                          const active = pathname === s.href;
+                          const active =
+                            s.href === item.href
+                              ? pathname === s.href
+                              : pathname === s.href || pathname.startsWith(s.href + "/");
                           return (
                             <li key={s.href}>
                               <Link

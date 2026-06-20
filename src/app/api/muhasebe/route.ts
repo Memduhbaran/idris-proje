@@ -10,6 +10,7 @@ const createSchema = z.object({
   amount: z.number().positive("Tutar 0'dan büyük olmalı"),
   title: z.string().min(1, "Kalem zorunlu"),
   counterparty: z.string().optional(),
+  cariId: z.string().nullable().optional(),
   paymentType: z.string().optional(),
   projectId: z.string().nullable().optional(),
   dueDate: z.string().optional(),
@@ -27,6 +28,7 @@ export async function GET(request: Request) {
   const type = searchParams.get("type");
   const status = searchParams.get("status");
   const tab = searchParams.get("tab");
+  const cariId = searchParams.get("cariId");
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
   const pageSize = Math.min(100, Math.max(10, parseInt(searchParams.get("pageSize") ?? "20", 10)));
   const skip = (page - 1) * pageSize;
@@ -51,6 +53,8 @@ export async function GET(request: Request) {
     where.type = { in: ["payable", "term_payable"] };
   }
 
+  if (cariId) where.cariId = cariId;
+
   if (status === "open" || status === "settled" || status === "cancelled") {
     where.status = status;
   }
@@ -58,7 +62,10 @@ export async function GET(request: Request) {
   const [list, total] = await Promise.all([
     prisma.accountingEntry.findMany({
       where,
-      include: { project: { select: { id: true, name: true } } },
+      include: {
+        project: { select: { id: true, name: true } },
+        cari: { select: { id: true, name: true, type: true } },
+      },
       orderBy: { txDate: "desc" },
       skip,
       take: pageSize,
@@ -82,12 +89,20 @@ export async function POST(request: Request) {
 
     const isSettleable = SETTLEABLE_TYPES.includes(data.type);
 
+    let counterparty = data.counterparty ?? null;
+    if (data.cariId) {
+      const cari = await prisma.cari.findUnique({ where: { id: data.cariId } });
+      if (!cari) return NextResponse.json({ error: "Cari bulunamadı" }, { status: 400 });
+      counterparty = cari.name;
+    }
+
     const entry = await prisma.accountingEntry.create({
       data: {
         type: data.type,
         amount: data.amount,
         title: data.title,
-        counterparty: data.counterparty ?? null,
+        counterparty,
+        cariId: data.cariId ?? null,
         paymentType: data.paymentType ?? null,
         projectId: data.projectId ?? null,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,

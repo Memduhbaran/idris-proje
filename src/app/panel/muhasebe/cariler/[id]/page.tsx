@@ -2,32 +2,35 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { MuhasebeKayitModal } from "@/components/panel/muhasebe/MuhasebeKayitModal";
 import { TahsilOdeModal } from "@/components/panel/muhasebe/TahsilOdeModal";
+import { CARI_TYPE_LABELS, type CariType } from "@/lib/cari";
 import { formatMoneyDisplay } from "@/lib/money";
 import type { AccountingType } from "@/lib/muhasebe";
 import { getAccountingTypeLabel, isPayableType, isReceivableType } from "@/lib/muhasebe";
+
+type CariInfo = {
+  id: string;
+  name: string;
+  type: CariType;
+  phone: string | null;
+  email: string | null;
+  openReceivable: number;
+  openPayable: number;
+  netBalance: number;
+};
 
 type Entry = {
   id: string;
   type: string;
   amount: number;
   title: string;
-  counterparty: string | null;
-  paymentType: string | null;
   dueDate: string | null;
   status: string;
   txDate: string;
-  project: { id: string; name: string } | null;
-  cari: { id: string; name: string; type: string } | null;
-};
-
-type Ozet = {
-  monthIncome: number;
-  monthExpense: number;
-  openReceivable: number;
-  openPayable: number;
+  paymentType: string | null;
+  counterparty: string | null;
 };
 
 const TABS = [
@@ -51,15 +54,17 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "İptal",
 };
 
-export default function MuhasebePage() {
-  const searchParams = useSearchParams();
-  const openNew = searchParams.get("yeni");
+export default function CariDetayPage() {
+  const params = useParams();
+  const id = params.id as string;
+
+  const [cari, setCari] = useState<CariInfo | null>(null);
   const [list, setList] = useState<Entry[]>([]);
-  const [ozet, setOzet] = useState<Ozet | null>(null);
+  const [monthIncome, setMonthIncome] = useState(0);
+  const [monthExpense, setMonthExpense] = useState(0);
+  const [tab, setTab] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [tab, setTab] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -69,55 +74,92 @@ export default function MuhasebePage() {
   function load() {
     setLoading(true);
     const params = new URLSearchParams();
+    if (tab) params.set("tab", tab);
     if (from) params.set("from", from);
     if (to) params.set("to", to);
-    if (tab) params.set("tab", tab);
-    if (statusFilter) params.set("status", statusFilter);
     params.set("page", String(page));
+
     Promise.all([
-      fetch(`/api/muhasebe?${params}`).then((r) => r.json()),
-      fetch("/api/muhasebe/ozet").then((r) => r.json()),
+      fetch(`/api/cari/cariler/${id}`).then((r) => r.json()),
+      fetch(`/api/cari/cariler/${id}/hareketler?${params}`).then((r) => r.json()),
     ])
-      .then(([data, ozetData]) => {
-        setList(data.list || []);
-        setTotal(data.total ?? 0);
-        setOzet(ozetData);
+      .then(([cariData, hareketData]) => {
+        if (cariData.error) {
+          setCari(null);
+          return;
+        }
+        setCari(cariData);
+        setList(hareketData.list || []);
+        setTotal(hareketData.total ?? 0);
+        setMonthIncome(hareketData.monthIncome ?? 0);
+        setMonthExpense(hareketData.monthExpense ?? 0);
       })
       .finally(() => setLoading(false));
   }
 
   useEffect(() => {
     load();
-  }, [from, to, tab, statusFilter, page]);
-
-  useEffect(() => {
-    if (openNew === "1" || openNew === "expense") setModalType("expense");
-    else if (openNew === "income") setModalType("income");
-  }, [openNew]);
+  }, [id, tab, from, to, page]);
 
   const totalPages = Math.max(1, Math.ceil(total / 20));
 
+  if (!loading && !cari) {
+    return (
+      <div className="panel-page">
+        <p className="panel-empty">Cari bulunamadı.</p>
+        <Link href="/panel/muhasebe/cariler" className="text-amber-700 text-sm font-medium">
+          ← Cariler listesi
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="panel-page space-y-6">
-      <h1 className="panel-heading">Muhasebe</h1>
+      <div className="flex flex-wrap items-start gap-3">
+        <div>
+          <Link
+            href="/panel/muhasebe/cariler"
+            className="text-sm text-slate-500 hover:text-amber-700 mb-1 inline-block"
+          >
+            ← Cariler
+          </Link>
+          <h1 className="panel-heading mb-0">{cari?.name ?? "…"}</h1>
+          {cari && (
+            <p className="text-sm text-slate-500 mt-1">
+              {CARI_TYPE_LABELS[cari.type]}
+              {cari.phone && ` · ${cari.phone}`}
+              {cari.email && ` · ${cari.email}`}
+            </p>
+          )}
+        </div>
+      </div>
 
-      {ozet && (
+      {cari && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="panel-card panel-card-body">
-            <p className="text-sm text-slate-500">Bu ay gelir</p>
-            <p className="text-xl font-semibold text-emerald-700">{formatMoneyDisplay(ozet.monthIncome)}</p>
-          </div>
-          <div className="panel-card panel-card-body">
-            <p className="text-sm text-slate-500">Bu ay gider</p>
-            <p className="text-xl font-semibold text-red-600">{formatMoneyDisplay(ozet.monthExpense)}</p>
-          </div>
-          <div className="panel-card panel-card-body">
             <p className="text-sm text-slate-500">Açık alacak</p>
-            <p className="text-xl font-semibold text-slate-900">{formatMoneyDisplay(ozet.openReceivable)}</p>
+            <p className="text-xl font-semibold text-emerald-700">
+              {formatMoneyDisplay(cari.openReceivable)}
+            </p>
           </div>
           <div className="panel-card panel-card-body">
             <p className="text-sm text-slate-500">Açık borç</p>
-            <p className="text-xl font-semibold text-slate-900">{formatMoneyDisplay(ozet.openPayable)}</p>
+            <p className="text-xl font-semibold text-red-600">
+              {formatMoneyDisplay(cari.openPayable)}
+            </p>
+          </div>
+          <div className="panel-card panel-card-body">
+            <p className="text-sm text-slate-500">Net bakiye</p>
+            <p className="text-xl font-semibold text-slate-900">
+              {formatMoneyDisplay(cari.netBalance)}
+            </p>
+          </div>
+          <div className="panel-card panel-card-body">
+            <p className="text-sm text-slate-500">Bu ay gelir / gider</p>
+            <p className="text-lg font-semibold text-slate-900">
+              {formatMoneyDisplay(monthIncome)} / {formatMoneyDisplay(monthExpense)}
+            </p>
           </div>
         </div>
       )}
@@ -138,15 +180,6 @@ export default function MuhasebePage() {
       <div className="flex flex-wrap gap-3 items-center">
         <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="panel-input w-40" />
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="panel-input w-40" />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="panel-select w-36"
-        >
-          <option value="">Tüm durumlar</option>
-          <option value="open">Açık</option>
-          <option value="settled">Kapalı</option>
-        </select>
       </div>
 
       <div className="flex flex-wrap gap-1 border-b border-slate-200">
@@ -180,10 +213,8 @@ export default function MuhasebePage() {
                 <th>Tür</th>
                 <th>Kalem</th>
                 <th className="text-right">Tutar</th>
-                <th>Cari</th>
                 <th>Vade</th>
                 <th>Durum</th>
-                <th>Proje</th>
                 <th></th>
               </tr>
             </thead>
@@ -195,22 +226,9 @@ export default function MuhasebePage() {
                   <td className="font-medium">{e.title}</td>
                   <td className="text-right font-medium">{formatMoneyDisplay(e.amount)}</td>
                   <td className="text-slate-500">
-                    {e.cari ? (
-                      <Link
-                        href={`/panel/muhasebe/cariler/${e.cari.id}`}
-                        className="text-amber-700 hover:text-amber-800"
-                      >
-                        {e.cari.name}
-                      </Link>
-                    ) : (
-                      e.counterparty ?? "—"
-                    )}
-                  </td>
-                  <td className="text-slate-500">
                     {e.dueDate ? new Date(e.dueDate).toLocaleDateString("tr-TR") : "—"}
                   </td>
                   <td>{STATUS_LABELS[e.status] ?? e.status}</td>
-                  <td className="text-slate-500">{e.project?.name ?? "—"}</td>
                   <td>
                     {e.status === "open" && (isReceivableType(e.type) || isPayableType(e.type)) && (
                       <button
@@ -227,7 +245,7 @@ export default function MuhasebePage() {
             </tbody>
           </table>
         )}
-        {list.length === 0 && !loading && <p className="panel-empty">Kayıt yok.</p>}
+        {list.length === 0 && !loading && <p className="panel-empty">Hareket yok.</p>}
       </div>
 
       {totalPages > 1 && (
@@ -254,8 +272,15 @@ export default function MuhasebePage() {
         </div>
       )}
 
-      {modalType && (
-        <MuhasebeKayitModal type={modalType} onClose={() => setModalType(null)} onSaved={load} />
+      {modalType && cari && (
+        <MuhasebeKayitModal
+          type={modalType}
+          cariId={cari.id}
+          lockCari
+          hideProject
+          onClose={() => setModalType(null)}
+          onSaved={load}
+        />
       )}
       {settleEntry && (
         <TahsilOdeModal entry={settleEntry} onClose={() => setSettleEntry(null)} onSaved={load} />

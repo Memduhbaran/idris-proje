@@ -70,6 +70,7 @@ export async function POST(
           amount: settleAmount,
           title: settleTitle,
           counterparty: entry.counterparty,
+          cariId: entry.cariId,
           paymentType: data.paymentType ?? entry.paymentType ?? "Nakit",
           projectId: entry.projectId,
           status: "settled",
